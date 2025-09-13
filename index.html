@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 GameHub - Мини Игры</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #000000, #2d1b69);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(45deg, #ffeb3b, #9c27b0, #000);
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease infinite;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ffeb3b;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .games-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, #2d1b69, #1a0033);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 400% 400%;
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0;
+            animation: rainbow 3s linear infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 235, 59, 0.3);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffeb3b;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px #ffeb3b;
+        }
+
+        .game-description {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #ffeb3b, #ffc107);
+            color: #000;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .play-button:hover::before {
+            left: 100%;
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 235, 59, 0.4);
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            margin-top: 3rem;
+        }
+
+        .game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2d1b69, #1a0033);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid #ffeb3b;
+            box-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #9c27b0;
+            padding-bottom: 1rem;
+        }
+
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #ff6666;
+            transform: scale(1.1);
+        }
+
+        .game-btn {
+            background: linear-gradient(45deg, #ffeb3b, #ffc107);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .game-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 235, 59, 0.4);
+        }
+
+        .game-stats {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .game-stats p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        /* Дартс */
+        .dartboard {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff4444 0%, #ffeb3b 30%, #4caf50 60%, #2196f3 100%);
+            margin: 0 auto 2rem;
+            position: relative;
+            cursor: crosshair;
+            border: 5px solid #fff;
+        }
+
+        .dart-target {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .dart-cursor {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            transition: all 0.1s ease;
+        }
+
+        /* Пазлы */
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            background: #333;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .puzzle-piece {
+            background: linear-gradient(45deg, #ffeb3b, #9c27b0);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+        }
+
+        .puzzle-piece.empty {
+            background: transparent;
+        }
+
+        /* Кости */
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            color: #000;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            border: 3px solid #ffeb3b;
+            transition: all 0.5s ease;
+        }
+
+        .dice.rolling {
+            animation: diceRoll 1s ease-in-out;
+        }
+
+        @keyframes diceRoll {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+        }
+
+        /* Баскетбол */
+        .basketball-court {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(to bottom, #87CEEB, #4169E1);
+            margin: 0 auto;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .basket {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+        }
+
+        .ball {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            transition: all 1s ease;
+        }
+
+        /* Память */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 320px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, #9c27b0, #ffeb3b);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            transform: scale(1.1);
+        }
+
+        /* Змейка */
+        #snakeCanvas {
+            border: 3px solid #ffeb3b;
+            background: #000;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .games-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+                padding: 2rem 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            .dartboard, .basketball-court {
+                width: 250px;
+                height: 250px;
+            }
+
+            .puzzle-board {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <header class="header">
+        <h1>🎮 GameHub</h1>
+        <p>Коллекция лучших мини-игр для развлечения</p>
+    </header>
+
+    <div class="games-container" id="gamesContainer">
+        <!-- Игры будут добавлены через JavaScript -->
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 GameHub - Играй и развлекайся! 🎯</p>
+    </footer>
+
+    <script>
+        const games = [
+            { icon: '🎯', title: 'Дартс', description: 'Попади в яблочко и покажи свою меткость!' },
+            { icon: '🧩', title: 'Пазлы', description: 'Собери картинку из кусочков' },
+            { icon: '🎲', title: 'Кости', description: 'Бросай кости и испытай удачу' },
+            { icon: '🃏', title: 'Карты', description: 'Классические карточные игры' },
+            { icon: '🎪', title: 'Цирк', description: 'Управляй цирковыми артистами' },
+            { icon: '🏎️', title: 'Гонки', description: 'Гоночные приключения на скорости' },
+            { icon: '🎨', title: 'Рисование', description: 'Создавай шедевры искусства' },
+            { icon: '🎵', title: 'Музыка', description: 'Ритмические игры и мелодии' },
+            { icon: '🏀', title: 'Баскетбол', description: 'Забрасывай мячи в корзину' },
+            { icon: '⚽', title: 'Футбол', description: 'Стань звездой футбола' },
+            { icon: '🎳', title: 'Боулинг', description: 'Сбивай кегли страйками' },
+            { icon: '🎭', title: 'Театр', description: 'Театральные представления' },
+            { icon: '🚀', title: 'Космос', description: 'Исследуй галактики и планеты' },
+            { icon: '🏰', title: 'Замок', description: 'Средневековые приключения' },
+            { icon: '🌊', title: 'Серфинг', description: 'Покоряй океанские волны' },
+            { icon: '🎪', title: 'Акробатика', description: 'Цирковые трюки и акробатика' },
+            { icon: '🎮', title: 'Аркада', description: 'Классические аркадные игры' },
+            { icon: '🧠', title: 'Логика', description: 'Тренируй свой мозг' },
+            { icon: '🎯', title: 'Стрельба', description: 'Меткая стрельба по мишеням' },
+            { icon: '🏃', title: 'Бег', description: 'Беговые соревнования' },
+            { icon: '🎪', title: 'Жонглирование', description: 'Учись жонглировать мячами' },
+            { icon: '🎨', title: 'Граффити', description: 'Уличное искусство и граффити' },
+            { icon: '🎭', title: 'Мимика', description: 'Игры с мимикой и жестами' },
+            { icon: '🎪', title: 'Клоуны', description: 'Веселые клоунские номера' },
+            { icon: '🎵', title: 'Караоке', description: 'Пой любимые песни' },
+            { icon: '🎲', title: 'Лото', description: 'Классическое лото с призами' },
+            { icon: '🃏', title: 'Покер', description: 'Техасский холдем покер' },
+            { icon: '🎯', title: 'Лучник', description: 'Стрельба из лука по мишеням' },
+            { icon: '🏎️', title: 'Дрифт', description: 'Дрифт на крутых поворотах' },
+            { icon: '🎪', title: 'Канатоходец', description: 'Балансируй на канате' },
+            { icon: '🎨', title: 'Скульптура', description: 'Создавай 3D скульптуры' },
+            { icon: '🎵', title: 'DJ Микс', description: 'Создавай музыкальные миксы' },
+            { icon: '🏀', title: '3-очковые', description: 'Трёхочковые броски в баскетболе' },
+            { icon: '⚽', title: 'Пенальти', description: 'Серия пенальти в футболе' },
+            { icon: '🎳', title: 'Страйк', description: 'Попади страйком в боулинге' },
+            { icon: '🎭', title: 'Импровизация', description: 'Театральная импровизация' },
+            { icon: '🚀', title: 'Ракета', description: 'Запускай ракеты в космос' },
+            { icon: '🏰', title: 'Рыцарь', description: 'Рыцарские турниры' },
+            { icon: '🌊', title: 'Дайвинг', description: 'Подводные приключения' },
+            { icon: '🎪', title: 'Фокусы', description: 'Магические фокусы и трюки' }
+        ];
+
+        function createGameCard(game, index) {
+            return `
+                <div class="game-card" style="animation-delay: ${index * 0.1}s">
+                    <span class="game-icon">${game.icon}</span>
+                    <h3 class="game-title">${game.title}</h3>
+                    <p class="game-description">${game.description}</p>
+                    <button class="play-button" onclick="playGame('${game.title}')">
+                        Играть 🎮
+                    </button>
+                </div>
+            `;
+        }
+
+        function loadGames() {
+            const container = document.getElementById('gamesContainer');
+            container.innerHTML = games.map((game, index) => createGameCard(game, index)).join('');
+        }
+
+        function playGame(gameName) {
+            createGameModal(gameName);
+        }
+
+        function createGameModal(gameName) {
+            const modal = document.createElement('div');
+            modal.className = 'game-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>🎮 ${gameName}</h2>
+                        <button class="close-btn" onclick="closeGame()">&times;</button>
+                    </div>
+                    <div class="game-area" id="gameArea">
+                        ${getGameContent(gameName)}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Запускаем игру
+            setTimeout(() => {
+                initializeGame(gameName);
+            }, 100);
+        }
+
+        function closeGame() {
+            const modal = document.querySelector('.game-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function getGameContent(gameName) {
+            switch(gameName) {
+                case 'Дартс':
+                    return `
+                        <div class="darts-game">
+                            <div class="dartboard" id="dartboard">
+                                <div class="dart-target"></div>
+                                <div class="dart-cursor" id="dartCursor">🎯</div>
+                            </div>
+                            <div class="game-stats">
+                                <p>Очки: <span id="dartsScore">0</span></p>
+                                <p>Броски: <span id="dartsThrows">0</span>/10</p>
+                            </div>
+                        </div>
+                    `;
+                case 'Пазлы':
+                    return `
+                        <div class="puzzle-game">
+                            <div class="puzzle-board" id="puzzleBoard"></div>
+                            <div class="game-stats">
+                                <p>Ходы: <span id="puzzleMoves">0</span></p>
+                                <button onclick="shufflePuzzle()" class="game-btn">Перемешать</button>
+                            </div>
+                        </div>
+                    `;
+                case 'Кости':
+                    return `
+                        <div class="dice-game">
+                            <div class="dice-container">
+                                <div class="dice" id="dice1">⚀</div>
+                                <div class="dice" id="dice2">⚀</div>
+                            </div>
+                            <button onclick="rollDice()" class="game-btn">Бросить кости</button>
+                            <div class="game-stats">
+                                <p>Сумма: <span id="diceSum">2</span></p>
+                                <p>Броски: <span id="diceRolls">0</span></p>
+                            </div>
+                        </div>
+                    `;
+                case 'Баскетбол':
+                    return `
+                        <div class="basketball-game">
+                            <div class="basketball-court">
+                                <div class="basket">🏀</div>
+                                <div class="ball" id="basketBall">⚫</div>
+                            </div>
+                            <button onclick="shootBall()" class="game-btn">Бросить мяч</button>
+                            <div class="game-stats">
+                                <p>Попадания: <span id="basketScore">0</span></p>
+                                <p>Броски: <span id="basketShots">0</span></p>
+                            </div>
+                        </div>
+                    `;
+                case 'Змейка':
+                    return `
+                        <div class="snake-game">
+                            <canvas id="snakeCanvas" width="400" height="400"></canvas>
+                            <div class="game-stats">
+                                <p>Очки: <span id="snakeScore">0</span></p>
+                                <p>Используй стрелки для управления</p>
+                            </div>
+                        </div>
+                    `;
+                default:
+                    return `
+                        <div class="memory-game">
+                            <div class="memory-board" id="memoryBoard"></div>
+                            <div class="game-stats">
+                                <p>Пары найдено: <span id="memoryPairs">0</span>/8</p>
+                                <p>Ходы: <span id="memoryMoves">0</span></p>
+                            </div>
+                        </div>
+                    `;
+            }
+        }
+
+        function initializeGame(gameName) {
+            switch(gameName) {
+                case 'Дартс':
+                    initDarts();
+                    break;
+                case 'Пазлы':
+                    initPuzzle();
+                    break;
+                case 'Кости':
+                    // Кости уже готовы
+                    break;
+                case 'Баскетбол':
+                    initBasketball();
+                    break;
+                case 'Змейка':
+                    initSnake();
+                    break;
+                default:
+                    initMemoryGame();
+                    break;
+            }
+        }
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                
+                // Случайные цвета для частиц
+                const colors = ['#ffeb3b', '#9c27b0', '#ff5722', '#4caf50', '#2196f3'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Игровая логика
+        let gameStates = {};
+
+        // Дартс
+        function initDarts() {
+            const dartboard = document.getElementById('dartboard');
+            const cursor = document.getElementById('dartCursor');
+            gameStates.darts = { score: 0, throws: 0 };
+            
+            dartboard.addEventListener('mousemove', (e) => {
+                const rect = dartboard.getBoundingClientRect();
+                cursor.style.left = (e.clientX - rect.left - 15) + 'px';
+                cursor.style.top = (e.clientY - rect.top - 15) + 'px';
+            });
+            
+            dartboard.addEventListener('click', (e) => {
+                if (gameStates.darts.throws >= 10) return;
+                
+                const rect = dartboard.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+                
+                const distance = Math.sqrt(Math.pow(clickX - centerX, 2) + Math.pow(clickY - centerY, 2));
+                let points = 0;
+                
+                if (distance < 20) points = 100;
+                else if (distance < 50) points = 50;
+                else if (distance < 80) points = 25;
+                else if (distance < 120) points = 10;
+                
+                gameStates.darts.score += points;
+                gameStates.darts.throws++;
+                
+                document.getElementById('dartsScore').textContent = gameStates.darts.score;
+                document.getElementById('dartsThrows').textContent = gameStates.darts.throws;
+                
+                // Анимация попадания
+                const hit = document.createElement('div');
+                hit.style.position = 'absolute';
+                hit.style.left = clickX + 'px';
+                hit.style.top = clickY + 'px';
+                hit.style.color = '#ffeb3b';
+                hit.style.fontWeight = 'bold';
+                hit.style.fontSize = '1.5rem';
+                hit.style.pointerEvents = 'none';
+                hit.textContent = '+' + points;
+                dartboard.appendChild(hit);
+                
+                setTimeout(() => hit.remove(), 1000);
+            });
+        }
+
+        // Пазлы
+        function initPuzzle() {
+            const board = document.getElementById('puzzleBoard');
+            gameStates.puzzle = { 
+                tiles: [1, 2, 3, 4, 5, 6, 7, 8, 0],
+                moves: 0
+            };
+            
+            renderPuzzle();
+            shufflePuzzle();
+        }
+
+        function renderPuzzle() {
+            const board = document.getElementById('puzzleBoard');
+            board.innerHTML = '';
+            
+            gameStates.puzzle.tiles.forEach((tile, index) => {
+                const piece = document.createElement('div');
+                piece.className = tile === 0 ? 'puzzle-piece empty' : 'puzzle-piece';
+                piece.textContent = tile === 0 ? '' : tile;
+                piece.onclick = () => movePuzzlePiece(index);
+                board.appendChild(piece);
+            });
+        }
+
+        function movePuzzlePiece(index) {
+            const tiles = gameStates.puzzle.tiles;
+            const emptyIndex = tiles.indexOf(0);
+            
+            const validMoves = [
+                emptyIndex - 1, emptyIndex + 1,
+                emptyIndex - 3, emptyIndex + 3
+            ].filter(i => {
+                if (i < 0 || i > 8) return false;
+                if (emptyIndex % 3 === 0 && i === emptyIndex - 1) return false;
+                if (emptyIndex % 3 === 2 && i === emptyIndex + 1) return false;
+                return true;
+            });
+            
+            if (validMoves.includes(index)) {
+                [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+                gameStates.puzzle.moves++;
+                document.getElementById('puzzleMoves').textContent = gameStates.puzzle.moves;
+                renderPuzzle();
+                
+                if (tiles.slice(0, 8).every((tile, i) => tile === i + 1)) {
+                    setTimeout(() => alert('🎉 Поздравляем! Пазл собран!'), 100);
+                }
+            }
+        }
+
+        function shufflePuzzle() {
+            for (let i = 0; i < 100; i++) {
+                const emptyIndex = gameStates.puzzle.tiles.indexOf(0);
+                const validMoves = [
+                    emptyIndex - 1, emptyIndex + 1,
+                    emptyIndex - 3, emptyIndex + 3
+                ].filter(i => {
+                    if (i < 0 || i > 8) return false;
+                    if (emptyIndex % 3 === 0 && i === emptyIndex - 1) return false;
+                    if (emptyIndex % 3 === 2 && i === emptyIndex + 1) return false;
+                    return true;
+                });
+                
+                const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                [gameStates.puzzle.tiles[emptyIndex], gameStates.puzzle.tiles[randomMove]] = 
+                [gameStates.puzzle.tiles[randomMove], gameStates.puzzle.tiles[emptyIndex]];
+            }
+            gameStates.puzzle.moves = 0;
+            document.getElementById('puzzleMoves').textContent = 0;
+            renderPuzzle();
+        }
+
+        // Кости
+        function rollDice() {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            
+            dice1.classList.add('rolling');
+            dice2.classList.add('rolling');
+            
+            setTimeout(() => {
+                const roll1 = Math.floor(Math.random() * 6) + 1;
+                const roll2 = Math.floor(Math.random() * 6) + 1;
+                
+                dice1.textContent = diceSymbols[roll1 - 1];
+                dice2.textContent = diceSymbols[roll2 - 1];
+                
+                document.getElementById('diceSum').textContent = roll1 + roll2;
+                document.getElementById('diceRolls').textContent = 
+                    parseInt(document.getElementById('diceRolls').textContent) + 1;
+                
+                dice1.classList.remove('rolling');
+                dice2.classList.remove('rolling');
+            }, 1000);
+        }
+
+        // Баскетбол
+        function initBasketball() {
+            gameStates.basketball = { score: 0, shots: 0 };
+        }
+
+        function shootBall() {
+            const ball = document.getElementById('basketBall');
+            const success = Math.random() > 0.4; // 60% шанс попадания
+            
+            gameStates.basketball.shots++;
+            document.getElementById('basketShots').textContent = gameStates.basketball.shots;
+            
+            if (success) {
+                ball.style.transform = 'translateX(-50%) translateY(-300px)';
+                gameStates.basketball.score++;
+                document.getElementById('basketScore').textContent = gameStates.basketball.score;
+                
+                setTimeout(() => {
+                    ball.style.transform = 'translateX(-50%) translateY(0)';
+                }, 1000);
+            } else {
+                ball.style.transform = 'translateX(-50%) translateY(-150px) translateX(50px)';
+                setTimeout(() => {
+                    ball.style.transform = 'translateX(-50%) translateY(0)';
+                }, 1000);
+            }
+        }
+
+        // Игра на память
+        function initMemoryGame() {
+            const symbols = ['🎮', '🎯', '🎲', '🎪', '🎨', '🎵', '🏀', '⚽'];
+            const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            
+            gameStates.memory = {
+                cards: cards,
+                flipped: [],
+                matched: [],
+                moves: 0
+            };
+            
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+            
+            cards.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = index;
+                card.textContent = '?';
+                card.onclick = () => flipMemoryCard(index);
+                board.appendChild(card);
+            });
+        }
+
+        function flipMemoryCard(index) {
+            if (gameStates.memory.flipped.length >= 2) return;
+            if (gameStates.memory.flipped.includes(index)) return;
+            if (gameStates.memory.matched.includes(index)) return;
+            
+            const card = document.querySelector(`[data-index="${index}"]`);
+            card.textContent = gameStates.memory.cards[index];
+            card.classList.add('flipped');
+            gameStates.memory.flipped.push(index);
+            
+            if (gameStates.memory.flipped.length === 2) {
+                gameStates.memory.moves++;
+                document.getElementById('memoryMoves').textContent = gameStates.memory.moves;
+                
+                const [first, second] = gameStates.memory.flipped;
+                if (gameStates.memory.cards[first] === gameStates.memory.cards[second]) {
+                    gameStates.memory.matched.push(first, second);
+                    document.getElementById('memoryPairs').textContent = gameStates.memory.matched.length / 2;
+                    
+                    setTimeout(() => {
+                        document.querySelector(`[data-index="${first}"]`).classList.add('matched');
+                        document.querySelector(`[data-index="${second}"]`).classList.add('matched');
+                    }, 500);
+                    
+                    if (gameStates.memory.matched.length === 16) {
+                        setTimeout(() => alert('🎉 Поздравляем! Все пары найдены!'), 600);
+                    }
+                } else {
+                    setTimeout(() => {
+                        document.querySelector(`[data-index="${first}"]`).textContent = '?';
+                        document.querySelector(`[data-index="${second}"]`).textContent = '?';
+                        document.querySelector(`[data-index="${first}"]`).classList.remove('flipped');
+                        document.querySelector(`[data-index="${second}"]`).classList.remove('flipped');
+                    }, 1000);
+                }
+                
+                setTimeout(() => {
+                    gameStates.memory.flipped = [];
+                }, 1000);
+            }
+        }
+
+        // Змейка
+        function initSnake() {
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            gameStates.snake = {
+                snake: [{x: 200, y: 200}],
+                food: {x: 100, y: 100},
+                dx: 20,
+                dy: 0,
+                score: 0
+            };
+            
+            document.addEventListener('keydown', (e) => {
+                const { dx, dy } = gameStates.snake;
+                switch(e.key) {
+                    case 'ArrowUp': if (dy === 0) { gameStates.snake.dx = 0; gameStates.snake.dy = -20; } break;
+                    case 'ArrowDown': if (dy === 0) { gameStates.snake.dx = 0; gameStates.snake.dy = 20; } break;
+                    case 'ArrowLeft': if (dx === 0) { gameStates.snake.dx = -20; gameStates.snake.dy = 0; } break;
+                    case 'ArrowRight': if (dx === 0) { gameStates.snake.dx = 20; gameStates.snake.dy = 0; } break;
+                }
+            });
+            
+            function gameLoop() {
+                const { snake, food, dx, dy } = gameStates.snake;
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                
+                // Проверка столкновений
+                if (head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400 || 
+                    snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    alert('Игра окончена! Счёт: ' + gameStates.snake.score);
+                    return;
+                }
+                
+                snake.unshift(head);
+                
+                // Проверка еды
+                if (head.x === food.x && head.y === food.y) {
+                    gameStates.snake.score++;
+                    document.getElementById('snakeScore').textContent = gameStates.snake.score;
+                    gameStates.snake.food = {
+                        x: Math.floor(Math.random() * 20) * 20,
+                        y: Math.floor(Math.random() * 20) * 20
+                    };
+                } else {
+                    snake.pop();
+                }
+                
+                // Отрисовка
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 400, 400);
+                
+                ctx.fillStyle = '#ffeb3b';
+                snake.forEach(segment => {
+                    ctx.fillRect(segment.x, segment.y, 18, 18);
+                });
+                
+                ctx.fillStyle = '#ff4444';
+                ctx.fillRect(food.x, food.y, 18, 18);
+                
+                setTimeout(gameLoop, 150);
+            }
+            
+            gameLoop();
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGames();
+            createParticles();
+        });
+
+        // Добавляем интерактивность при скролле
+        window.addEventListener('scroll', function() {
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                
+                if (isVisible) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e8d5ef160bbf49',t:'MTc1Nzc3ODk5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
